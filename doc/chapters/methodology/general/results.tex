@@ -1,0 +1,93 @@
+\section{Unit Test Results}
+% Probably should email Charles about whether to include unit test results as part of the results section, or as part of appendix/poster.
+    %CF: yes would be good to show some red and green here
+%            (actually just green!)
+% E.g. Unit tests -> Function integration results -> Size results -> Profiling results
+% on poster have initial tests and and refactored tests.
+
+
+% Figure using numpy, figure using tensorflow
+After writing the unit tests we can use tools to automatically run them.
+This allows us to monitor and manage the unit tests.
+
+\picturesque{figures/res_unit_tests/numpy.png}{Unit test results for the NumPy version on CPU of the \mono{boltzmannProbs} function.}{fig:unit_numpy}
+
+The initial tests were written with respect to the existing code, and to show a variety of behaviour for the function.
+As such the tests will always pass, as seen by the green ticks in \figureref{fig:unit_numpy}
+The tests showing as skipped (grey circle with line through it) are tests that are expected to fail.
+This helps to manage the behaviour of the model.
+
+\picturesque{figures/res_unit_tests/tensorflow.png}{Unit test results for the Tensorflow version on GPU of the \mono{boltzmannProbs} function.}{fig:unit_tensorflow}
+
+As each test focuses on a single aspect, we can compare between the different versions of the model.
+For example, the first test executed is the test on an array of large complex numbers.
+This case is unlikely to occur, as it is not normally encountered in regular use.
+On the GPU, this test takes approximately 1000ms, as seen in \figureref{fig:unit_tensorflow}.
+In contrast, the test only takes 50ms on the CPU, seen in \figureref{fig:unit_numpy}.
+This is a 20x slowdown in the GPU version, which is likely due to the effect of initialising Tensorflow.
+Subsequent tests then show similar times to the NumPy versions, with several tests on the GPU matching or improving upon the NumPy equivalent times.
+
+The test that shows the most interesting behaviour is the 1000 by 1000 test, which seems to indicate that the GPU version is slower by approximately 50\%. 
+This is likely an anomalous result, as the GPU version matches the CPU version on most of the other    tests.
+% The most interesting test is the 1000 by 1000 test, which seems to indicate that Tensorflow is slower on larger matrices.\wording
+% This is unlikely however, and likely hardware dependent.
+
+\pagebreak
+\section{Function Timing}
+\begin{table}[ht]
+    \centering
+    \resizebox{\linewidth}{!}{
+        \begin{tabular}{|c|c|c|c|c|c|}
+            \hline
+            TEST ID & PARALLEL FUNCTION IMPLEMENTATION DETAILS & SIZE(of CA3) & TIME(s) & MAZE & TRAIN TYPE \\ \hline
+            0 & Initial Implementation & 86 & 83.323  & PLUS & FULL \\ \hline
+            1 & boltzmannprobs & 86 & 407.743 & PLUS & FULL \\ \hline
+            2 & boltzmannprobs and addBias & 86 & 410.667 & PLUS & FULL \\ \hline
+            3 & boltzmannprobs, addBias and hardThresh & 86 & 408.420 & PLUS & FULL \\ \hline
+            4 & addBias and hardThresh & 86 & 89.255  & PLUS & FULL \\ \hline
+            5 & addBias & 86 & 90.315  & PLUS & FULL \\ \hline
+            6 & hardThresh & 86 & 85.431  & PLUS & FULL \\ \hline
+            7 & trainPriorBias and hardThresh & 86 & 85.334  & PLUS & FULL       \\ \hline
+            8 & trainPriorBias, invsig and hardThresh & 86 & 85.753 & PLUS & FULL \\ \hline
+            9 & invsig and hardThresh & 86 & 84.903 & PLUS & FULL \\ \hline
+            10 & invsig & 86 & 86.566  & PLUS & FULL \\ \hline
+            11 & trainPriorBias and invsig & 86 & 86.791 & PLUS & FULL \\ \hline
+            12 & trainPriorBias & 86 & 86.705 & PLUS & FULL \\ \hline
+            13 & outer convienience function & 86 & 284.001 & PLUS & FULL \\ \hline
+            14 & outer and boltzmannProbs & 86 & 428.402 & PLUS & FULL \\ \hline
+            15 & outer, boltzmannProbs and Tensorflow random & 86 & 423.419 & PLUS & FULL \\ \hline
+            16 & outer, highly optimised boltzmannProbs and Tensorflow random & 86 & 352.254 & PLUS & FULL \\ \hline
+            17 & outer, decorated, highly optimised boltzmannProbs and Tensorflow random & 86 & 335.582 & PLUS & FULL \\ \hline
+        \end{tabular}
+    }
+    \caption{
+        Table of results comparing different functions as we parallelise the learning process.\footnotemark
+    }
+    \label{tab:results_table_functions}
+\end{table}
+\footnotetext{
+    Results were gathered on a AMD FX8320 CPU (3.5GHz clock speed), 16GB 1600MHz Quad channel RAM and ASUS GT710-SL-2GD5 GPU (Uses Nvidia Geforce GT710 technology)
+    \label{foot:system}
+}
+\tableref{tab:results_table_functions} shows how parallelising a given set of functions affects the runtime of the system after integration. 
+The test id column refers to which test is being run.
+The second column is defining which functions have been parallelised, with test 0, being CPU only functions.
+The size column refers to the size of the CA3 sub-field, which is kept at 86 to help maintain consistency across different implementations.
+The time column is the average wall clock time it takes to run the system. 
+An average time is used to account for differences at the operating system level, such as interrupts and transfer overhead, which can occur at different times.
+The final two columns give insight into the environment the model is learning (see \figureref{fig:plus_maze}, and the different methods of training the model.
+These training methods include using the DG only, using handset weights only or using random weights only.
+We opted to use all three training types to show that our optimisations can apply to each method.
+
+It can be seen that there are two distinct bands of time, depending on the parallel functions integrated.
+This is likely due to the number of calls to the \mono{boltzmannProbs} and outer functions, which results in multiple data transfers that is expensive.
+
+Test IDs 16 and 17 show a further optimised version of the \mono{boltzmannProbs} function.
+This is because the initial optimised \mono{boltzmannProbs} function was a translation of the original \mono{boltzmannProbs} function.
+However Tensorflow does not have a replacement for the NumPy dot function.
+This means that the multiplication of a matrix and scalar value does not work in Tensorflow.
+To get around this limitation, an if statement for type checking was used.
+But this added several unnecessary operations to the code.
+Thus a more optimised form of the function, which primarily depends on the \mono{tf.tensordot} function is used, with inputs being forced into matrices before being passed to the function.
+The decorator applied to the \mono{boltzmannProbs} function in test ID 17 is \mono{tf.function}. This provided the optimisation of compiling the function into a data flow graph instead of executable Python code.   
+This resulted in the model being faster, and the version used for further analysis.

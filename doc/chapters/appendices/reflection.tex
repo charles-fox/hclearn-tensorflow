@@ -1,0 +1,26 @@
+% PLan for reflective analysis, paragraph for each, maybe 2 for last point, aim for ~1pg
+% What went well? (Unit testing, integration testing of independent functions)
+% What did not go well? (Integration of dependent functions)
+% Compare to bachelors (did what I learn carry forward?, how do the projects differ?)
+% What could I have done better (Verification that accuracy remains similar +-5%, more rigourous testing, learning more about tensorflow 1 and 2 near the start of the project, followed test driven development rigour better)
+\section{Reflection}
+This project has been an enjoyable process for me.
+It has allowed me to expand my knowledge of different machine learning models and techniques.
+I usually use an iterative Waterfall approach to software development, using unit tests has been a welcome change of pace.
+It made the overall development of the project a lot smoother as it helped me understand the purpose of each function used in the learning process, and how they interact between each other.
+
+The overall process of the development of the parallel version was smooth. 
+This was due to the unit tests making it easier to see where problems were and how they may affect future model development over different iterations.
+By using unit tests in this project, I have found that there are more benefits to using unit tests than not using them, which I will be using in future projects.
+
+When considering what did not go well, it was mainly the integration of each function into the overall system.
+This is because of the difference between Tensorflow and NumPy with different implementations of functions, such as the dot product.
+This caused a variety of solutions to be created to manage this, however they all had some variation that means they may not have been optimal.
+Another problem from the project is that the speed up seen in experimental results is not as expected, with approximately 2x speed up occurring at 1000+ neurons, and approximately 7x speed up at 3000+ neurons, whereas we were expecting to see around a 100x speed up with larger network sizes.
+
+In comparison to my bachelors project, I feel this project has been more successful. This was likely due to the extra time that could be dedicated to the project, without other assignments to worry about.
+Another reason for this project being more successful is that I was able to take lessons learned from my bachelors project, such as involving my supervisor more and using more resources available to me.
+
+If I was to redo this project, I would focus more on understanding different parallel frameworks before beginning development, and how different versions of these libraries affect their performance.
+Another thing that I would redo is to be more rigorous in following test driven development, as I have developed a parallel function before the tests.
+This had a negligible effect on the development of the software, but does encourage poor habits when developing code.

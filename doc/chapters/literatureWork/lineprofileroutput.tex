@@ -1,0 +1,23 @@
+\begin{minipage}{\linewidth}
+\begin{lstlisting}[caption={Example output from the line profiler tool, showing part of the learn function of the model.}, label=profiling:line_learn]
+Scale: 1e-6s
+Total time: 529.294 s
+File: /home/yakkus/github/jack-fork/hclearn/workspace/src/main/learnWeights.py
+Function: learn at line 21
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+    21                                           @profile
+    22                                           def learn(path, dictSenses, dictGrids, N_mazeSize, ecs_gnd, dgs_gnd, ca3s_gnd, b_learnIdeal=True, b_learnTrained=False, b_learnDGWeights=True, learningRate=0.01):
+    23         1          4.0      4.0      0.0      dghelper=None
+    24  #Learn DG weights when you have visual input
+    25         1          3.0      3.0      0.0      if b_learnDGWeights:
+    26  #Extract data from dictionary of senses to train on 
+    27         1         14.0     14.0      0.0          allSURFS = [ sense.surfs for sense in 
+    ...
+    59                                           
+    60         1   19120224.0 19120224.0      3.6          WR = trainW(lag(hids,1), hids, WB, N_epochs=1, alpha=0.01)
+    61         1   18793573.0 18793573.0      3.6          WS = trainW(senses,      hids, WB, N_epochs=1, alpha=0.01)
+    62         1   17906180.0 17906180.0      3.4          WO = trainW(odom,        hids, WB, N_epochs=1, alpha=0.01)
+\end{lstlisting}
+\end{minipage}

@@ -1,0 +1,32 @@
+\section{Verification of model accuracy}
+The results outlined above only consider the learning process.
+However for our optimisations to be considered successful, we need to compare the accuracy of the initial serial implementation of the model with the current parallelised implementation.
+
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{|c|c|c|c|}
+        \hline
+        Version & Learned Weights   & Handset Weights   & Random Weights    \\\hline
+        CPU     & 63.70\%           & 62.33\%           & 19.37\%           \\\hline
+        GPU     & 41.93\%           & 67.27\%           & 19.37\%           \\\hline
+    \end{tabular}
+    \caption{
+        Table comparing the accuracy of the model with respect to a 3000 step walk in the plus maze for each type of learning method, using handset weights, learned weights and random weights.
+    }
+    \label{tab:res_Metrics}
+\end{table}
+
+\tableref{tab:res_Metrics} shows the accuracy of the model for both the original CPU implementation and our parallelised implementation.
+We consider 3 types of weights, weights learned from our learning process, handset weights of the model and random initialisation of weights.
+For the random initialisation of weights there is no change in accuracy. 
+This is due to the seed for initialising the weights being the same across both models.
+
+With the handset weights, our implementation shows an overall increase of 5\% in Accuracy.
+This suggests that the parallelised model obtains a more accurate picture of it's environment when given a good starting weight value for each area of the model.
+However there is a loss of 20\% accuracy when using learned weights from the learning process.
+This implies that there is an error in our learning process that affects the overall accuracy.
+
+The next step from this is to add unit tests to both the learning and the evaluation process.
+These tests would be targeted to capture the behaviour which causes the learned accuracy to be reduced.
+This would allow the problem to be investigated and fixed, and would improve the accuracy to being approximately the same as the initial, CPU version.

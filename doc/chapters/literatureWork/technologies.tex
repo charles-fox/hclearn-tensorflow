@@ -1,0 +1,305 @@
+\section{Parallel Computing Technologies}
+
+% CF: you need to introduce this section, why is it here, what will it be doing?
+% We have so far reviewed hippocampus biology and models.
+% The aim of this study is to make those models go faster in computational implmentations.
+% Paralization is a way to make them go faster.
+% There are many forms of a prallelisation technology.
+% We will need to choose one.
+% So this section will review these options and make this choice.
+We have currently reviewed the biology of the hippocampus and a model that uses it.
+This model currently uses a serial process to learn.
+The aim of the study is to make the model learn faster in computational implementations.
+One method of making them go faster is parallelisation.
+However there are many forms of parallelisation technology.
+As such we will need to choose one, focusing on GPUs only.
+So this section will review these options and make a choice on the technology to use.
+
+\subsection{Low level}
+\subsubsection{CUDA}
+CUDA is a proprietary parallel framework for interfacing with NVidia GPUs.
+It is a C-based programming language, and uses kernel functions to run code in parallel.
+CUDA handles the launching of kernels and memory management through the use of the CUDA runtime\citep{nvidiacuda}.
+The CUDA runtime makes the assumption that memory on the host (CPU/RAM) and memory on the device (GPU) are separate.
+This means that data needs to be transferred between the CPU and GPU when the GPU is needed.
+This creates overhead from the copy operations, as well as spawning the CUDA runtime process.
+On the other hand, this approach to the initialisation of CUDA means that GPU is only in use when needed, and can be considered free when not in use, allowing multiple programs access to the same hardware. %\textit{{\color{blue}Need to verify this claim. Was written in "I am the expert mode"}}
+
+\subsubsection{OpenCL}
+OpenCL is an open-source parallel framework for interfacing with GPUs. 
+As an open framework, it is capable of working on both NVidia GPUs and AMD GPUs.
+However there are only a few functions in the standard.
+This means that external libraries, such as clBLAS \citep{clblas} or CLBlast \citep{clblast} are needed to aid machine learning applications.
+
+\input{chapters/literatureWork/clbloat}
+
+When programming for pure OpenCL, a developer is often writing the code that directly interfaces with the GPU.
+The libraries reduce the amount of code that needs writing by providing optimised routines, however these routines often perform a single function.
+Thus they are not suitable for neural network calculations as each operation would need to be transferred between the CPU and GPU, increasing overhead.
+
+% In contrast, CUDA has these libraries built into the API.\wording  
+% Furthermore, CL code directly interfaces with the GPU.
+% This makes CL extremely low level.
+% As such it is not as suitable for machine learning using biology based computation.
+
+
+
+In addition, the OpenCL runtime requires a large amount of setup code to begin working with it.
+The setup code is trivial to create, as seen in \coderef{code:cl_init}.
+However it adds a large amount of preparation code for each call to a parallel kernel.
+This increases the amount of code for a given function, which is likely to increase overall running time, and reduce the readability of the function.
+
+
+
+As OpenCL is able to run on multiple brands of GPUs, there are many different implementations of the standard.
+However, as CUDA is directly tied to NVidia GPUs, there is only a small distinction between the CUDA API and CUDA Runtime, as it is closely tied to NVidia GPUs.
+There have been attempts to integrate the CUDA API onto other devices, using
+OpenCL as the base for it's processing.
+We discuss a couple of these implementations below.
+
+% \noteCF{CF: Unlike CL, these is less disticntion between API and implmention in CUDA, because it's so tied to NVida cards.  In theory, there is a CUDA API and one or more implemnetations, which could include one or more architectures able to implement it.   Just recently for example there have been attempts to implement the CUDA API by compilint it into CL then using any CL backend, such as FPGA etc as well as GPU.}
+
+% This means that some common parallel operations, such as matrix multiplication would need to be self implemented.
+% This reduces the available time for testing the model.
+
+% \noteCF{CF: really? aren't there available BLAS or Eigen implenetations for OpenCL , or other matrix libs? the real reason to not use CL is that it is oo low level, TF is a beter match for nueural level stuff due to its graph structure.}
+
+% Because of the self implementation, it is likely that the functions needed for machine learning applications would be not properly optimised.
+% This makes it less likely that the system will be able to operate as fast as possible.
+% On the other hand, more proprietary frameworks, such as CUDA, already have highly optimised functions for common machine learning applications.
+% This makes OpenCL an unsuitable parallel library for our project.
+% \begin{itemize}
+%     \item Bloat of CL code.
+%     \item Should probably have a code example here to help explain the bloat
+%     \begin{itemize}
+%         \item lot of initial setup
+%         \item large amount of memory usage
+%     \end{itemize}
+%     \item Good point: Gives a lot of control to the user
+%     \item Obfuscation/abstraction of strings
+% \end{itemize}
+
+
+
+% Open standard, thus anyone can use it. Moderately clunky to use. When using it developers are often working directly with what gets executed, rather than working with highly optimised and tested library functions. This can be useful in some cases, however most applications do not need this level of control/responsibility.
+
+% \subsubsection{OpenMPI}
+% Old standard
+ 
+% originally developed in 1991
+
+% Parallelisation is obtained by passing messages between devices.
+
+% This makes it suitable for distributed applications.
+% This might be useful in the future, however our project only uses a single machine.
+
+% Should we consider OpenMPI? It's parallelisation via messages similar to network packets, which makes better for distributed workload, but as our workload focuses on single machine workload, it adds to much overhead.
+
+\subsubsection{ROCm/HIP}
+ROCm is a low level parallelisation framework for AMD Hardware, developed by AMD.
+It uses a single source model.
+This allows it to work on different hardware platforms, such as CPUs, APUs and GPUs.
+
+It has different variations depending on the target platform and applications, such as servers (ROCk) and machine learning (mlOpen).
+This allows it to be similar to CUDA.
+It also supports HIP code, which allows ROCm programs to run on CUDA-enabled GPUs.
+
+However, it is a relatively new technology, in comparison to CUDA and OpenCL \cite{rocminsights}.
+This means that it does not have the same amount of support as CUDA for machine learning.
+This makes it unsuitable for our project, as it can require a large amount of setup compared to using native CUDA hardware.
+% Very similar to CUDA
+
+% Allows CUDA based software to run on Non-nvidia GPUs
+
+% Developed by AMD
+
+% reference point https://moorinsightsstrategy.com/wp-content/uploads/2016/11/AMDs-ROCm-Software-Helps-Accelerate-HPC-and-Deep-Learning-by-Moor-Insights-and-Strategy.pdf
+
+\subsubsection{SYCL}
+In contrast to OpenCL and CUDA, SYCL is a relatively new low level platform for parallel computing.
+It builds upon the OpenCL standard, however unlike OpenCL it incorporates high level routines as well.
+As such, it sits between the code and other low-level architectures such as OpenCL, CUDA and OpenMP.
+
+SYCL programmes use a single source paradigm.
+This allows for parallel kernels to be included as part of the original source.
+This reduces the overhead for loading the kernels into the program, unlike OpenCL.  
+It also means that code written for SYCL can be compiled for different platforms, such as CUDA and HIP/ROCm. 
+By allowing the compiler to handle how the code is compiled and initialised, it can be assumed that the routines used are heavily optimised for the architecture.
+
+%Summary for SYCL
+Like ROCm, SYCL is relatively new.
+As such, there is not as much support for SYCL implementations of higher level libraries.
+There has been an attempt to port Tensorflow, which originally uses a CUDA backend, to a SYCL b backend (find sycl tensorflow), however it is in the alpha stages, thus it may not be stable enough for our purposes.  
+
+% Relatively new ~5 years old
+
+% Inspired by OpenCL
+
+% Has multiple "flavours"
+%     - different versions of the same source for different compilers/apis
+%     - e.g. Clang, Compute for CUDA, OpenMPI, hip/ROCm
+
+% Single source multiple compiler
+%     - Can be compiled for different frameworks
+%     - Kernels are written in source of code files, don't need to be loaded as external file/string
+
+% Let compiler handle initialisation of parallel framework
+
+% structure:
+%     code -> SYCL -> Backend(Cuda/OpenCL/OpenMPi)
+
+% not all backends provide pre-built kernels
+
+% {\color{green}
+% Point of interest: levels of data parallelism
+% \begin{itemize}
+% \item Basic data, i.e. no syncronisation needed. e.g. add 2 vectors
+% \item Work-group, i.e. reduction style kernels
+% \item Heirachical, i.e. element-wise parallel operations in work-groups
+% \end{itemize}
+% }
+
+% reference point https://www.khronos.org/registry/SYCL/specs/
+
+% sycl-2020-provisional.pdf
+
+
+\subsection{High level parallel libraries for Python}
+\label{subsec:highlevellibs}
+There are different parallel libraries for high level languages which can be used to bind native language code, such as Java and Python, to the low level libraries like CUDA and OpenCL. 
+As the computational implementation of the UCPF model by \cite{saul2011} uses Python, we consider a subset of Python bindings as there are many different bindings in various stages of implementation compliance.
+
+% We focus on a subset of Python bindings to the low level libraries described above as the model by \cite{saul2011} uses python.\wording
+% We consider a subset of python bindings as there are many different implementations of the low level libraries in various stages of implementation compliance.\wording
+
+\subsubsection{PyOpenCL}
+PyOpenCL\cite{kloeckner_pycuda_2012} is a binding to the OpenCL library.
+Kernels are written as strings, and the PyOpenCL library compiles them into executable code.
+This provides the benefit of being able to easily write and understand the kernels.
+However, software written with OpenCL requires a lot of setup in order to execute it, as seen in \coderef{code:cl_init}.
+
+PyOpenCl only provides bindings to the OpenCL API, thus external libraries such as clBLAS would need to be imported as well to make use of them, which can be considered a non-trivial task.
+In addition, many machine learning backends, e.g. Keras and Theano, focus more on CUDA based implementations, as opposed to an OpenCL implementation.
+Implementing functions of the UCPF-HC model as OpenCL kernels would optimise the model, however it would also increase the overall complexity of the software, an outcome that refactoring aims to avoid.
+This makes PyOpenCL unsuitable for our project.
+
+
+% As PyOpenCL only provides the bindings to the OpenCL library, common machine learning operations, such as matrix multiplication, would need a kernel written specifically for it.
+% This detracts from the development of the unit tests for the model, and reduces overall time spent on identifying slow areas of code.
+% In addition, OpenCL is a standard and has little support for machine learning.\wording
+% This is due to many machine learning backends, such as Keras and Theano focusing more on the CUDA API.
+% The lack of support for machine learning further suggests that OpenCL will become more unsuitable for complex tasks, and only used for teaching an understanding of parallel computing.\wording
+
+
+\subsubsection{CuPy}
+
+CuPy is an array manipulation library accelerated by CUDA. 
+It aims to be a NumPy compatible library~\citep{cupy_learningsys2017}. 
+This means it provides functions that operate the same as NumPy functions.
+This is useful as it would make the transition from NumPy, which is a serial array manipulation library that the model currently uses, to a parallel system easier.
+
+However part of our development process is to create a system that is easy to update in the future.
+Whilst CuPy could be used as a parallelisation framework, it's similarity to the current serial implementation, NumPy, does not push the boundary far enough to allow for different frameworks to be experimented with. 
+Furthermore, CuPy does not integrate with machine learning backends, such as Keras.
+This is detrimental because it does not allow for future builds of the backends, which include Restricted Boltzmann Machines and other machine learning architectures aside from neural networks to be easily integrated with out existing model, provided the implementations are able to pass the tests.
+In addition, CuPy does not scale across multiple GPU devices, which indicates that versions of the model with several thousands of neurons would be incompatible with using CuPy as the backend for handling the learning.
+
+
+\subsubsection{Theano}
+
+Historically, the first widely used data flow graph system was Theano. 
+Theano evolved over several years and eventually influenced newer libraries such as TensorFlow and Torch.
+Both of these libraries have replaced Theano but they still owe many architectural and implementation features to it.
+
+Theano works by defining mathematical operations and data points as nodes on a directed acyclic graph \citep{theano}. 
+This graph is then compiled to a highly optimised form.
+By compiling the graph, it allows for reduced memory consumption, and the transfer of the model to a hardware accelerated device, such as GPUs.
+GPU computation is done on CUDA enabled devices.
+
+This parallel computation makes Theano suitable for vector and matrix calculations, which allows it to be useful for neural network calculations.
+This makes Theano suitable for our purposes as our model heavily uses
+matrix calculations as part of it's calculations.
+
+However, Theano is an older library, with support from the official maintainers, MILA stopped as of 2017 \citep{milaTheano2017}. 
+This means that it is less likely to support current hardware, and will not support future hardware.
+As such, we will not be using Theano for this project as our intent is to allow for future parallelisation of the model.
+
+
+
+
+\subsubsection{PyTorch}
+PyTorch is a set of Python bindings to the Torch Machine Learning Tensor library, developed by Facebook.
+As a tensor library, it has mathematical functions implemented, as well as machine learning algorithms.
+It is primarily developed for batch processing, using custom cache allocations to reduce synchronisation barriers and maximise device usage.
+
+A large proportion of the PyTorch machine learning functionality is provided by the libTorch library.
+This allows for efficient operations as libTorch is written in C/C++.
+This does cause some overhead compared to working in pure Python, however the highly optimised C code negates the overhead.
+In addition the Python language does have the ability to compile it's code as C code.
+This makes the overall processing much faster, and more suitable for deployment purposes.
+
+The authors of PyTorch focus on the philosophy of `everything is a program' \cite{paszke2019pytorch}.
+This suggests that software written for PyTorch can be considered as a collection of small, independent programs.
+By decoupling implementation from usage, the philosophy makes it suitable for unit testing as each program can be tested independently.
+In addition, testing can be performed on the integration of these programs.
+
+Applying the philosophy of PyTorch to our system, we have three major programs: the creation of the environment, the learning process and the verification process, which would simplify our system for future work, as it can be targeted for a particular subsystem, with full integration being tested near the end of the process.
+However, implementing the model in this manner greatly increases the scope of our refactoring, and does not benefit our optimisation focus.
+
+\subsubsection{Tensorflow}
+
+Like Theano, Tensorflow is a tensor based machine learning library that is being developed by Google.
+It originally used a graph-based execution model, with tensor operations being defined as nodes on the graph.
+However as of Tensorflow 2 it uses an eager execution model.
+This makes it useful for prototyping, however eager execution also reduces the overall optimisation of the model as it is interpreting the human-readable code as opposed to the machine readable binary.
+\begin{minipage}{\linewidth}
+\begin{lstlisting}[caption=Tensorflow Code Example, label=code:tensorflow1, language=python]
+input_1 = tf.Variable(shape=(5,1))
+input_2 = tf.Variable(shape=(1,3))
+operation_matmul = tf.matmul(input_1, input_2)
+operation_sum = tf.reduce_sum(operation_matmul)
+
+\end{lstlisting}
+\end{minipage}
+
+As Tensorflow 2 is a machine learning library, it primarily works with the Keras backend.
+This is because Keras is a simple to use framework for learning deep netwroks.
+Due to the versitility of deep learning in performing different tasks, such as Writing Music \citep{dhariwal2020jukebox}, Voice Puppetry \citep{deepneuralvoicepuppetry} or Medical Analysis \citep{coviddeepprognosticdiagnostic}, it makes deep models extremely useful outside of research based tasks.
+In contrast to deep learning, our model is considered shallow.
+This means that we will not be working with Keras or deep learning in our study, however having them as an option for future work is beneficial.
+This is because the developers of these libraries may implement functions for Restricted Boltzmann Machine Learning in the future, and these will likely be highly optimised by being low level functions with high level invokers.
+
+Despite the focus on Deep learning and neural networks with Keras~\citep{tensorflowtutorials}, Tensorflow can also be used as a maths library.
+This is useful for our purposes as it can act as a replacement for NumPy, without being extremely similar. 
+It also allows the model to operate on a different maths framework which should enable easier porting of the network to different frameworks/libraries.
+
+%\textbf{\color{red}CF: you might want to review some parallel profiler tool here as well?   because we are now finding that it might be useful.  what does actually mean to profile a parallel program?  wall clock time vs compute time.  might be useful to find any problems with the latest version -- i am surprised that its not faster yet.}
+
+\subsubsection{Choice of framework}
+A study by \citep{bahrampour2015comparative} compares different machine learning frameworks.
+The study looks at five frameworks, Caffe, Neon, Theano, Torch and Tensorflow.
+Their results indicate that in terms of speed, Theano and Torch are the best options, for small and large networks respectively.
+However this study was published in 2016, which means that the results may not reflect current standards in these libraries, such as Theano discontinuing development and the release of Tensorflow 2.0.
+
+The study also indicates that Tensorflow is shown to have the most flexibility. 
+This flexibility makes it simpler to create software with it as it allows for variances when refactoring the model.
+It should also be noted that GPU tests in the study use Tensorflow with cuDNN v2, whereas the other listed libraries use cuDNN v3.
+This was because these were the officially supported versions, thus optimisations in cuDNN versions may have affected the results.
+
+Another reason for choosing Tensorflow over other machine learning libraries 
+is that it allows for low level data flow graphs to be generated, whereas many other machine learning libraries for Python focus on Multi-layer Perceptron model architectures. It is more beneficial to have control over the data flow graphs for this model as we are using modified versions of the standard Temporal Restricted Boltzmann Machine equations. 
+
+
+% \noteCF{CF: its not clear here that the reason reason is that most of the others only do MLPs. Tensorflow is lower level letting you mke your own dataflow graphs lik you need here.}   
+
+% Study by \note{https://arxiv.org/pdf/1511.06435.pdf}
+% Their results show that Theano and torch are the best options for speed, THeano for small and Torch for large.
+% However Tensorflow is the most flexible.
+% Tensorflow is also middle of the road?
+% Make more sense to use Torch/Theano, Tensorflow flexibility allows for more creative solutions to be available.
+
+% Rework this paragraph
+% Although Tensorflow is primarily developed for the CUDA platform, there are also custom tensorflow build targeting the SYCL platform.
+% This allows us to exercise the power of Tensorflow on non-CUDA enabled GPUs, which is useful for further work where the model is transferred from a simulation setting to a real world example.
+% However for simplicity's sake we will be using stock Tensorflow.
+% This will allow for simple verification of our work by other researchers.\noteAttention{This is probably weak/unnecessary. Should probably try to consider better reason.} 

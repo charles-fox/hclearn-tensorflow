@@ -1,0 +1,24 @@
+\begin{sidewaystable}
+%\begin{table}[h]
+\centering
+\resizebox{\linewidth}{!}{
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+IMPLEMENTATION DETAILS & CA3 SIZE & TIME(s) & MAZE & TRAIN TYPE \\ \hline
+Initial Implementation & 86& 83.323  & PLUS & FULL \\ \hline
+boltzmannProbs & 86 & 407.743 & PLUS & FULL \\ \hline
+boltzmannProbs and addBias & 86 & 410.667 & PLUS & FULL \\ \hline
+boltzmannProbs, addBias and hardThresh & 86 & 408.420 & PLUS & FULL \\ \hline
+addBias and hardThresh & 86 & 89.255 & PLUS & FULL \\ \hline
+addBias & 86 & 90.315 & PLUS & FULL \\ \hline
+hardThresh & 86 & 85.431 & PLUS & FULL \\ \hline
+trainPriorBias & 86 & 85.334 & PLUS & FULL \\ \hline
+cffun\#invsig & 86 & & PLUS & FULL \\ \hline
+trainPriorBias and cffun\#invsig & 86 & & PLUS & FULL \\ \hline
+\end{tabular}
+}
+    \caption{Table of results comparing different functions as we parallelise the learning process}
+    \label{tab:results_table_all_1}
+%\end{table}
+
+\end{sidewaystable}

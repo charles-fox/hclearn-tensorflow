@@ -1,0 +1,165 @@
+\section{Profiling}
+% Paraphrase from Frontiers report? 
+%\note{The cProfile and Profile module, paraphrase from frontiers}
+% Probably include memory profiling and GPU profiling as extra points.
+% \textbf{\footnotesize{CUDA}}
+% \note{GPU profiling is Vendor/Architecture based <- i.e. signpost paragraph}
+% new tools: NSight Systems, NSight Compute
+% \begin{itemize}
+%     \item Compute handles kernel profiling
+%     \begin{itemize}
+%         \item does memory profiling
+%         \item shows the dependencies of kernels in graph form
+%         \item useful as individial parts can be identified as problems.
+%         \item https://developer.nvidia.com/nsight-compute
+%     \end{itemize}
+%     \item Systems handles algorithm performance
+%     \begin{itemize}
+%         \item time per operation
+%         \item useful to identify slower sections of the algorithm
+%         \item makes it easier to tune the software
+%         \item \note{however this type of tuning is hardware dependent, would need to be done for each system the model runs on. Best to leave at default}
+%         \item helps find inefficiencies in parallelisation, e.g. unneccessary syncing and poor algorithm choice for device. 
+%         \item https://developer.nvidia.com/nsight-systems
+%     \end{itemize}
+% \end{itemize}
+
+% \textbf{\footnotesize{OpenCL}}
+
+% Done via events in the language
+
+% e.g. \verb|clGetEventProfilingInfo|
+
+% Limitation: time only, no memory
+
+% https://www.khronos.org/registry/OpenCL/sdk/2.2/docs/man/html/clGetEventProfilingInfo.html
+
+
+
+
+\section{Technologies}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+% Torch
+% what is it?
+%     - Modern Tensor processing library
+%     - Can switch between graph based and eager execution modes
+%     - Bindings of the Torch library to python?
+
+% Suitable for many ML applications
+%     uses the libtorch c++ library for parallel operations
+%     not linked with other libraries, they are only an option
+
+% geared towards batch processing. 
+% this is due to custom cache allocations to reduce barriers and maximise usage
+% our model is time-based, thus less suited to \note{batch processing}?
+
+
+% Machine Learning tensor library. Like theano has mathematical functions implemented, is more widely used, not sure on cons, need to read the Pytorch/Torch programming guide to compare
+
+% \note{http://papers.nips.cc/paper/9015-pytorch-an-imperative-style-high-performance-deep-learning-library.pdf}
+
+% \note{https://arxiv.org/pdf/1511.06435.pdf}
+
+% \note{https://ieeexplore.ieee.org/abstract/document/7979887}
+    
+
+
+% philosophy of "everything is a program"
+% this means that torch programs can be considered a collection of smaller programs
+% de-couples implementation from system, i.e. means to an end, how something is implemented is unrelated to how it is used.
+% Makes it suitable for building test driven software
+% but is focused on neural networks, likely because of their popularity in the wider world. 
+
+
+% Tensorflow
+  % What is it?
+%     - Tensor based ML library -- like Theano
+%     - Originally a graph based execution model
+%     - Changes to eager model as of version 2.
+%     / give some code examples
+    
+% Differences between tensorflow 1.X and tensorflow 2.X:
+%   Eager execution:
+    
+%     Tensorflow 1.X uses a graph based system 
+%     which needed to be compiled 
+%     and needed to be told which device to use. 
+
+%     Tensorflow 2.X uses GPU by default if possible. More profiling/analysis tools are available for tensorflow than other libraries.
+
+%     Syntax
+%     CUDA , CL and other backend supports?
+
+
+% Machine learning applications
+%     - Mainly works with Keras as of TF2
+%         too much emohasis is now given to keras/DN!
+%             eg. the online tutorials are so keras based that its hard to see the actual data flow grah any more
+%             explain that thi thesis is not keras or DL
+
+% Implementations            
+%     - Can work with other backends, 
+%         such as Theano in TF1
+%         CL support via SYCL, consudered as an option for this theis
+        
+%     - Can be used as maths library
+%         - this is what we are using it for
+
+%Py Open CL
+% see listing  2.0
+% TODO talk about the impact of C code vs Python Code
+
+% Not suitable for machine learning workflows.
+% this is due to no math functions available.
+% does not allow for connection to backends like keras
+% leads to being not very future proof, despite using more open software.
+
+
+%CUPY
+% CuPy goal is to emulate numpy in CUDA. Pro: Very little overhead/fluff, only things necessary for CUDA. CON: Not all functions implemented. Can't be easily transplanted, i.e. changing import numpy as np to import cupy as np does not make it automatically work. 
+% Other note developed as backend for chainer
+
+
+%Theano
+%What it does:
+%    accelerates numerical computation flows
+%    but only if running same calculation lots of times
+    
+%How it works:
+%    build you a graph
+%    compile it
+%        what happens when you compile?
+%        what is the input
+%        what is the output (GPU kernel function? in CUDA? in GPU-asm?)
+%    send to gpu
+%    send (lots of) data to GPU
+%    call graph on one datum at a time
+    
+%    has some higher level libraries
+%            eg. maths functions, examples...
+    
+%what its good for?
+%    matrices and vectors
+%    eg neural network weights (deep learning)
+    
+%Limitiations:
+%    no longer supported
+%        because google hired up all their people, bastards
+%        docs not updates
+%        wnt work on modern GPU?
+%    technical limited?

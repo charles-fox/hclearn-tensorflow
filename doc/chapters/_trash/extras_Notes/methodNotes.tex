@@ -1,0 +1,50 @@
+% Memory optimisation:
+% #. As size increases, so does memory usage
+% #. As memory is finite, we need to consider data types
+% #. Tensorflow defaults python and numpy floats to being 64 bit floats
+% #. GPUs work best with 32 bit floats
+% #. Modifying Test ID 15 code to use 32 bit floats allows for nodes on CA3, at the expense of presicion.
+% #. This is an acceptable loss of precision as change greater than 1e-7 is negligible
+
+% Casting is an expensive operation
+% #. several points we do a cast from boolean/float64 to float32
+% #. this makes it another candidate for optimisation
+% #. check it using the timeit module
+% #. get results: [60, 60, 60, 60] for sizes [10, 100, 1000, 10000] over 1000000 invocations
+% #. it is sufficient, but can still slow for our purposes, is there a better way?
+% #. enter `tf.where`
+% #. uses condition to provide a numeric value
+% #. exactly what a lot of our casting is doing
+% #. running timeit on `tf.where` for same sizes gives [42, 42, 42, 42]
+% #. 18 seconds, or 25\% over 1000000 invocations
+% #. run process to make sure it does what we want it to.
+% #. successful, test integration into system <- not done yet
+% #. time saved = ? Profit/Bust?
+
+
+
+
+
+
+
+
+% Probably should include section on artificial inflation of CA3 and what we expect to see.
+
+
+%\textbf{\color{red}CF: TODO shall we try running with 10000 CA3 cells now to see if the GPU version is then faster?}
+%\textit{\color{red}JS: Tried running with 1086 CA3 cells (1000 extra bias cells), results appear to be 12mins for pure CPU, 10 mins for GPU/Tensorflow, so size is a big factor. Also ran with 5086 neurons on CPU, currently taking over 50 mins to process on CPU w/ numpy}
+%\textit{\color{red}JS: to run more than 5086 nodes on GPU, I need more than 2gb of G-RAM. I have a 4gb card on the way, should have results for 10086 nodes by next week.
+
+%\textbf{\color{red}CF: can we do parallel profiling to find the new bottlenecks in the TF version?}
+%\textit{\color{red}JS: It would appear so. There apparently is a tensorflow profiling flag, though I don't know how to enable it.}
+
+%\textbf{\color{red}CF: can you find a standard TF program with CPU and GPU versions to test that your TF setup is running on GPU as you think?}
+%\textit{\color{red}Standard TF programs seem to be training a traditional model, e.g. VGG-16, on a given dataset e.g. CIFAR-10 }
+
+%\textbf{\color{red}CF: do we understand how TF code actually gets executed when it's combined with non-GPU operations such as string and type checking? How does the TF compiler decide what to move to the GPU and can that be slowed down if your tf commands are all mixed up with CPU ones?}
+
+%\textbf{\color{red}CF: we don't want to get slowed down by python specific issues -- we are using python but only to instruct tensorflow what to optimise and send to GPU.}
+
+%\textbf{\color{red}CF: learn how exactly TF takes your commands and moves them into GPU, in particular, what happens if you have a CPU command in the middle of a load of of tf commands?  +add to lit review as you go.}
+
+%\textit{\color{red} Need to include consideration how size of components (DG, CA3, CA1, etc) affect runtime}

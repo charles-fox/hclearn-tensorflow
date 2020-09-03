@@ -1,0 +1,37 @@
+\section{Process of refactoring}
+The first step of our refactoring and optimisation process is to identify the best function to optimise. 
+This is done by profiling the code using cProfile, and using a chart of most time taken for our functions.
+After this we traverse down the call stack to find the deepest function, i.e. the function that does not call any other function from our program.
+We then implement unit tests for this function, considering the data types that we expect to see, such as real floating point numbers, data types that we are unlikely to see, such as imaginary numbers and integers, and data types that we shouldn't see, such as strings and booleans.
+This allows us to understand the behaviour of the code under different situations.
+As the goal of the project is to maintain/improve execution time, we also consider cases of small inputs, such as a 2x2 matrix and a 1x10 vector and large inputs, such as a 1000x1000 matrix and a 1x1000 vector.
+This will allow us to compare how well the different implementations handle horizontal scaling in isolation.
+
+Once the unit tests, examples of which can be seen in \coderef{code:unit_test_eg} have been written, we implement our parallelised version using the Tensorflow library.
+We can then use our unit tests to ensure that our implementation matches the current implementation.
+After verifying our implementation, we can then integrate it into the original system.
+Once integrated, we can repeat the process to further improve the overall system.
+These functions would come from any function used in the learning process, as it will allow us to move as much computation onto the GPU as possible, which would speed up the overall learning process.
+
+
+% \noteCF{CF: you could show the actual units tests here, or a sample of them, as code. or in an appendix.}
+\input{chapters/methodology/general/exampleTestCode}
+
+\section{Evaluating the refactoring process}
+% Need to mention wall clock time vs CPU time
+The effectiveness of our refactoring will be evaluated by the average runtime of the system.
+We do this by timing how long 10 consecutive invocations take and calculating an average time taken.
+An average time allows us to account for operating system schedulers as well as transfer time of data between the CPU and GPU.
+This time will then be compared against the pure CPU implementation, and we should expect to see some reduction in time taken.
+
+We obtain the time taken by using the unix \mono{time} command.
+This provides three different measures of time taken, wall clock or "real" time, user time and system time.
+Wall clock time refers to the difference between the unix timestamp when the program starts and when the program exits.
+User time and system time (CPU time) accumulate based on the actual amount of time the CPU is being used for the program being timed.
+
+We will be using wall clock time as our measurement.
+This is to provide an understanding of how long the process takes as with respect to the real world.
+We could use CPU time, which only tracks how long the process takes on the CPU only.
+This is not useful to our project, as more operations will take place on the GPU, which is not considered as part of CPU time.
+This would distort the results, showing that there is a significant improvement to the model, whereas in reality this may not be the case.
+In contrast, as the wall clock time can be considered consistent relative to changes within the software, this reduces the effect of the distortion caused by executing operations on the GPU over the CPU. 

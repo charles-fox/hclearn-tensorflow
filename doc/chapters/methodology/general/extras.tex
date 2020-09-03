@@ -1,0 +1,60 @@
+\subsubsection{Understanding the model for refactoring}
+
+% \noteCF{CF: I think all of this should go in Methods chapter, it is real work. You need to show off a lot more of the actyal work you have done refactoing into TF. eg. giv many code examples of before and after functions.}
+
+Before we can perform good refactoring of the model, we first need to understand how the model works, and what can be done to limit the variation in overall results that are seen.
+We discuss how the computational implementation of the model works, and how randomness can affect results, alongside minimising the effects of randomness. 
+
+The Unitary Coherent Particle filter of Hippocampus (UCPF-HC) model was initially developed in 2010, when serial computing was prevalent.
+The learning method, contrastive divergence \citep{hintonDBN2006} is a primarily serial processing method, with each successive sample requiring the previous one.
+This means that there are limited points of parallelisation in the learning process.
+
+There are two key operations in our implementation of the learning process that should be parallelised, the calculation of individual probabilities for each input type to the model (biases, recurrent values, odometry and sensors) and the fusion of these probabilities into a singular joint probability table.
+These operations can be considered parallel as each node of the model is independent of the others for these operations, meaning that a parallel worker can be applied to each node for the calculation, which should reduce the overall time to learn.
+
+
+\subsubsection{Randomness in the UCPF-HC}
+The UCPF-HC model uses randomness in two points of the execution of the system, in building the representation of the world and determining which neurons are active in the hidden state of the Temporal Restricted Boltzmann Machine (TRBM).
+
+Pseudo random number generators (pRNGs) are used to create the random numbers for the model's learning process.
+However many pRNGs generate random numbers using a serial algorithm.
+% \wording
+This is a problem in parallel computing as each calculation thread operates independently.
+This means that if a thread requires access to a random number, it may retrieve a different value depending on the order the threads access the pRNG.
+This would then cause the output of anything depending on the random function to be different, which breaks our concept of unit testing.
+Seeding the pRNG reduces the effect of the random numbers as it allows for a predictable sequence of numbers to be used.
+However the access to the pRNG is still relatively random from the operating system scheduler.
+
+Nvidia is currently working on a framework determinism project \cite{projectFrameDeter}.
+This project aims to make parallel random number generation deterministic.
+This is useful as it gives complete control over the usage of the random number generator.
+However the project is currently in the alpha/beta stage of development.
+This indicates that there is not full, stable support for dependents of the project.
+Furthermore, the main project does not appear to have been updated in the last 10 months, which suggests that the project has been dropped for the time being.
+
+
+% very hard problem in our case as we need to account for psuedo-randomness in our implementation.
+% This is because concurrency and pRNGs do not play nicely, e.g. Thread A gets first random number and thread B gets second random number, then in consecutive launch thread B gets first random number and thread A gets second random number.
+% Seeding the rng reduces the effect of this, but it's not always reliable
+% Tensorflow-determinism project also appears to aid in solving the problem, but is not in a stable state and should not be used.
+% Another problem caused by asynchronous code is random number generation.
+% this is because kernels will query the same rng object(in global memory) as different times in consecutive system launches
+% as we can't define the order in which kernels access the rng, this can lead to different results.
+% One option is to seed the rng.
+% whilst this gives a predictable order to the rng, it does not work for parallel becuase of the above problem.
+% There is a team working on a framework-determinism package.
+% This package aims to make it easier to handle rng in a deterministic fashion by
+% removing rng manipulations from the low-level libraries, such as CUDA and OpenCL
+% However this package is not stable enough for our needs.
+% Was originally developed for tensorflow, but was changed to accomadate other ML frameworks, e.g. PyTorch
+
+
+
+
+
+
+
+
+% \note{https://www.youtube.com/watch?v=TB07\_mUMt0U\&feature=youtu.be}
+
+% \note{https://arxiv.org/pdf/0911.3456.pdf}

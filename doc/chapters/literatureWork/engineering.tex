@@ -1,0 +1,97 @@
+\section{Software Engineering and refactoring}
+\input{chapters/literatureWork/se/profiling}
+\input{chapters/literatureWork/se/units}
+
+\subsection{Refactoring with Unit Tests}
+
+Unit tests are traditionally used for the creation of software, as they are designed to help a developer create software.
+This is because you can define the expected behaviour of a function and work to that definition.
+However they can also be used in conjunction with profiling for speeding up known functions via refactoring.
+This is because we can write the tests for a function that is causing the bottleneck from profiling.
+We can then develop a new version of the function with Tensorflow, using these tests to preserve behaviour.
+
+% As mentioned above, technical debt is created as part of the software development life-cycle.
+% Technical debt is where software uses a quick lazy approach to code creation over properly developed code.
+% In test driven development, technical debt occurs from developing the software without using tests.
+% Refactoring can be used to reduce the technical debt created by developing a project.
+% As an existing project, the HC-UCPF has technical debt.
+% This indicates that refactoring will help reduce the overall technical debt.
+
+% What is technical debt? 
+% How is it created?
+
+% What is refactoring?
+% Why does it solve technical debt?
+
+% Who is Fowler?
+% What are his ideas?
+% Why are they a good approach to refactoring?
+
+
+A prominent figure in the field of refactoring is Martin Fowler.
+Fowler describes unit testing as being situational, with a unit referring to an agreed upon identifier, such as a function, class or object, and a test referring to a fast, low-level implementation of the unit, focusing on a small part of the system ~\citep{fowlerUnit2014}.
+
+Fowler suggests a hat-based approach to refactoring.
+This means that as a developer, you would wear different metaphorical hats depending on the job.
+Whilst wearing a particular hat, you purely focus on that job.
+This reduces the chance of getting confused on what you are doing when working on the code.
+
+% How does this relate to our project?
+% \begin{itemize}
+%     \item create unit tests to help understand what is going on with the code
+%     \item implement new version for chosen parallel lib
+%     \item integrate into system
+%     \item full details in section 3.1
+% \end{itemize}
+% Fowler's Keynote speeches are the star here, namely the hat system. Our hats are testing (for unit tests), creation (for new tf code), integration (for implementing functions into system), ?system analysis (for delving into the namespace at specific points in execution/call stack and understanding what is going on)?
+
+For our project, we are refactoring the model to allow for parallel execution of the learning process via unit testing.
+This will also have the effect of making the learning easier to understand moving forward.
+Hence we are reducing the technical debt of the project.
+This allows us to create a number of hats for the different tasks, as follows:
+\begin{itemize}
+    \item A hat for the creation of unit tests.
+    \item A hat for the development of parallel functions using Tensorflow.
+    \item A hat for managing the integration of the parallel functions into the overall system.
+\end{itemize}
+% \noteAttention{What do these hats do?}
+These hats can help guide the development of the project.
+By developing the project in this way, we can control the scope of the refactoring, and keep it focused on the learning process, rather than the setup or evaluation.
+
+Using the unit tests as a base for our refactoring is useful as it allows for faster system analysis in the event of a crash.
+This is because the stack trace displayed when a crash occurs usually identifies the line that caused the crash.
+This relies on the developer understanding the system to know how to fix it.
+
+However our hierarchical approach to creating the unit tests reduces the amount of knowledge required.
+This is because the inputs can be retrieved from a breakpoint in the debugging process, and then transferred to being inputs to a test script.
+This test script then runs the unit tests on all functions and nested functions within that get invoked from the crash causing line.
+Thus the overall time needed to fix the crash gets reduced as the unit tests identify how the crash is caused, making it easier to fix.
+Furthermore, by reducing the amount of knowledge needed to understand the system at the onset of a project in this manner, we are able to curb the growth of future technical debt that the system may obtain.
+% Why is this approach good for this method?
+% \begin{itemize}
+%     \item Allows for faster system analysis/debugging
+%     \begin{itemize}
+%         \item when code errors we get stack trace
+%         \item stack trace usually identifies where problem is.
+%         \item having unit tests for the identified problem makes it easier to identify problem and fix
+%     \end{itemize}
+%     \item reduces future technical debt
+%     \begin{itemize}
+%         \item functions often grow in scope
+%         \item this allows for a trigger for when function is doing too much
+%         \item KISS principle
+%     \end{itemize}
+% \end{itemize}
+
+
+
+% We have only considered serial programming for refactoring
+% however we are moving to a parallel approach
+% this makes the software run asynchronously
+% which makes it harder to identify where a problem lies
+
+% This can be solved using unit tests in the fowler approach
+% we can use the tests with inputs being the workgroups of the kernel launches
+% This allows us to identify which workgroup is causing the problem.
+% By identifying the problem input, we can work backwards through the software to find the first mutation which leads to the error.
+

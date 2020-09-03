@@ -1,0 +1,112 @@
+We have written this report in the form of a scientific paper as we plan to publish it. 
+However the MSc Research Project assessment criteria requires additional information that is not usually included in publications.
+As such, we include this information below.
+%  This report has been written in the format of a scientific paper as we plan to publish it. The MSc assessment criteria requires some additional information not usually included in publications, so we include this below.
+
+\section{Aims and objectives}
+The aim of the project is to use Tensorflow to parallelise a model of the hippocampus to make it more suitable for real-time/real world use. To do this we will need to complete the following objectives:
+\begin{itemize}
+    \item Write unit tests to understand current system behaviour
+    \item Ensure the initial implementation passes unit tests.
+    \item Write Tensorflow-based Python code that emulates current system behaviour.
+    \item Verify our Tensorflow code works as expected using the unit tests.
+    \item Time the system using different combinations of the original code and parallel code,
+    \item Profile the final system and compare it to our original profiling results.
+\end{itemize}
+
+% This section is probably not necessary however I am putting this down as part of ticking the boxes of the brief.
+% \subsection{Hypothesis}
+% The hypothesis of this project is that moving the model to train on the GPU will cause the model to run faster at scale. 
+\section{Tools and Toolsets}
+% This covers things not in the lit review, going by kai's things like IDE, automation scripts etc.
+As a software engineering project, we will need to use tools outside those covered above to manage the development of the model.
+
+\subsection{Development Environment}
+% Ubuntu 18.04
+% What is Jetbrains Intellij Idea, why was it useful (i.e. integration with python, git shell, ?csv files?
+% Python 3.6 and libraries w/ versions.(List)
+% Automation scripts with shell. (simulate how system would work on robot?)
+The model is developed on Linux, as it would be a similar operating environment that would be used in the real world.
+We use Jetbrains Pycharm as our development environment as it provides quality of life features such as code completion and inspection. 
+It also has integration with Git which makes it easier to see which files have been modified.
+This helps in managing which functions have been integrated into the system as a whole.
+It also allows for the management of virtual Python environments, which separate Python libraries to reduce confusion on which libraries to use. 
+Below is a list of libraries that need to be installed into the environment in order to obtain a minimum working environment.
+
+\begin{itemize}
+    \item Pip version: 20.1.1
+    \item NumPy version: 1.18.4
+    \item Matplotlib version: 3.2.1
+    \item Pyflann3 version: 1.8.4.1
+    \item Opencv-contrib-python-nonfree version: 4.1.1.1
+    \item Tensorflow version: 2.2.0
+\end{itemize}
+
+\subsection{Git and Github}
+% What is Git
+% Why did we use it.
+Git is a version control tool.
+It records changes to files in a tree based manner.
+This is useful for our project as it provides a method to return to a previous model state quickly and easily.
+This allows for different paths that the model can be developed in to be explored, which makes overall development faster.
+In addition, it also acts as a backup mechanism, by regularly pushing updates to repository sites like Github, as it allows the model to be restored at any time in the event of hard drive failure or loss of data.
+% \footnote{All results can be found at https://github.com/a\-yakkus/hclearn/wiki/results2020}
+% TODO convert to link. This is the table in my research journal.
+
+
+\subsection{Latex and Overleaf}
+% What is Latex
+% Why did we use it.
+Latex is a typesetting system.
+This allows it to have a singular source, but provide different document layouts.
+This makes it easier to convert the report to different formats for publication.
+There are multiple environments for processing latex documents, such as Overleaf, TexLive and MikTex.
+We chose Overleaf as it is an online environment, which suggests that there is some form of redundancy measures in place.
+This is useful as it means that if a local drive was to fail, the report would not be lost.
+In addition, an online environment allows for easy collaboration with others. This makes it easier to work with my supervisor and proofreaders, as discussions on minor changes can be made quickly and easily.
+Another reason for choosing Overleaf instead of Texlive and MikTex is that it is a managed system.
+This means that extra packages, such as table/figure rendering and placement are instantly available.
+Whilst these packages can be installed into a TexLive or MikTex environment, it would slow down the creation of the report.
+Finally, in order to convert latex source to a suitable document for submission, it is customary to compile the same source code multiple times to fix intradocument referencing. 
+This can be done in the other environments, however Overleaf provides a partially parsed log when compilation fails, which makes it easier to identify the problem and fix it as opposed to the other environments which would require identifying the problem from the logs. % Which has already been done enough in this project from python + tensorflow in order to get a working prototype to push to git/time. 
+
+
+
+\section{Project Management}
+When developing software, there are multiple methodologies that can be applied, such as Agile and Waterfall.
+However our project revolves around refactoring an initial software package.
+This makes the Waterfall methodology unsuitable for the project, as the requirements are subject to change after each optimisation after refactoring.
+Agile practices, on the other hand are more suitable for our project.
+This is because the intermediary goals, such as which function to optimise next changes after each build of the system.
+This allows us to move fluidly through the development of parallel versions of the function, with no strict oversight on what should be done next.
+
+As test driven development uses short software cycles to develop functions, it works well with an Agile approach.
+Furthermore, test driven development is suitable for refactoring as it allows us to manage deterministic behaviour easily.
+This means that if a function does not pass the tests, then it enables the developer to revisit the function and work out where the error that causes the test to fail occurs.
+Test driven development has been useful for this project in ensuring that behaviour is correct of our refactored functions.
+\subsubsection{Risk Matrix}
+% TODO table of risks
+% Ideas:
+% Computer breaks (CPU/GPU)
+% Data loss (i.e. hard drive failure)
+% Deviation from plan
+% Poor use of Version Control
+% 
+When doing a software engineering project, there are risks that can occur during the project. We display these risks in \tableref{tab:risks}.
+
+\begin{table}[ht]
+    \centering
+    \resizebox{\linewidth}{!}{
+        \begin{tabular}{|p{2.5cm}|p{1.5cm}|p{1.5cm}|p{2cm}|p{5cm}|}
+            \hline
+            Risk & Severity Level & Impact & Likelihood & Mitigation  \\ \hline
+            Hardware failure & 4 & 4 & 1 & Replace failed components of the machine with the same component \\ \hline
+            Data Loss & 3 & 3 & 2 & Regularly back up data to multiple external sources\\ \hline
+            Deviation from main optimisation points & 1 & 4 & 3 & Focus mainly on the big optimisations, and return to smaller optimisations at a future point in time. \\ \hline
+        \end{tabular}
+    }
+    \caption{Risk matrix for project.}
+    \label{tab:risks}
+    
+\end{table}
+

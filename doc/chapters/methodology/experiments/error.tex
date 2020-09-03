@@ -1,0 +1,53 @@
+\section{Optimisation of the error function}
+We can use line profiling to identify other areas of optimisation.
+An example of this is the error function, which takes up ~20\% of the execution time. 
+This makes it suitable candidate for optimisation.
+Looking at the code in \coderef{code:errorfunc}, lines 2, 3, and 5 are element-wise operations, meaning that the parallelisation of these operations are simple, as Tensorflow tensors can already handle them.
+The interesting line in this code is line 4.
+This is because the Python keyword \mono{sum} performs a serial operation, which is inherently slow, and has no direct counterpart in Tensorflow.
+However, there is a similar function, \mono{tf.reduce\_sum} which exhibits the same behaviour in a parallel manner.
+\begin{minipage}{\linewidth}
+\begin{lstlisting}[caption=Error function split into each operation, label=code:errorfunc,language=python]
+def err(probabilities, hidden_state):
+    difference = probabilities-hidden_state
+    squared_difference = difference ** 2
+    sum_difference = sum(squared_difference)
+    error = sum_difference / hidden_state.shape[0]
+    return error
+\end{lstlisting}
+\end{minipage}
+
+\subsection{Results from optimising the error function}
+\label{subsec:res_sum}
+
+
+As seen in \tableref{tab:sum_v_reduce}, \mono{tf.reduce\_sum} maintains a relatively constant time regardless of the number of nodes used. 
+This indicates that the optimisation is useful for reducing the overall learn time of the model, when comparing against a pure CPU implementation.
+
+\begin{table}[ht]
+    \centering
+    \begin{tabular}{|c|c|c|}
+        \hline
+        Number of Nodes & sum (s)   & tf.reduce\_sum (s)\\ \hline
+        10              & 0.183     & 0.018             \\ \hline
+        100             & 1.496     & 0.011             \\ \hline
+        1000            & 14.652    & 0.010             \\ \hline
+        10000           & 144.899   & 0.011             \\ \hline
+    \end{tabular}
+    \caption{ Timing 100 invocations of the named functions across different numbers of nodes. The times reported are cumulative of the 100 invocations. }
+    \label{tab:sum_v_reduce}
+\end{table}
+
+Implementing this optimisation into the model using 86 nodes in the CA3, we obtain an average runtime of 331.1 seconds. 
+This is another minor improvement alongside the casting optimisation above, indicating that there is still a bottleneck in the code.
+However, when the model is trained to learn a larger area, with more nodes, this optimisation will be beneficial.
+
+% 336.378 seconds with tf.reduce sum
+
+% \noteGeneral{This needs re-writing, checking on the 20th August shows there may be improvements from it, but not enough time to implement them and get results.}
+% \textsc{
+% As mentioned above, the optimisation of the error function looks to be very useful.
+% After integrating the new error function into the system, we run 5 invocations of it using test ID 17 as a base.
+% This gave an average runtime of the learning process of \noteGeneral{800} seconds, compared to the base time being 350 seconds.
+% This is the opposite of what was expected, and as such this optimisation idea will not be used going forward.
+% As we are using version control software to manage each revision of the model, we can easily rollback the model to a base state.\noteGeneral{Is this sentence necessary, I think it is, however feels like fluff.}}

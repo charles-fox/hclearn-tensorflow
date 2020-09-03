@@ -1,0 +1,16 @@
+\begin{abstract}
+
+%\textbf{\color{red}Hippocampus is great! It is the stuff that dreams are made on.\newline
+%GPU programming is great! It's like all the crap that deep learning people go on about but with actual real programming and architecture.\newline
+%Let's do both great things at once!}
+The Hippocampus is a useful biological model of spatial memory.
+Functioning models of hippocampus may be useful for robot navigation.
+Previous work, \citep{foxandprescott2010A,foxandprescott2010B, saul2011} developed a computer model to mimic the hippocampus, implemented in serial code.
+However, serial execution is very slow at scale.
+This means that the model only functioned in very small `toy' environments.
+Modern GPUs can massively parallelize execution of neural networks. 
+This is usually done for the backpropagation of multilayer perceptrons, but they similarly offer the possibility of speeding up more realistic biological networks such a this hippocampus model.
+This project aims to modify the model's existing serial learning process to be more parallel, using GPU hardware.
+Our research finds that the model may be suited to using the CPU for small environments, however in simulated larger environments that the model may need to learn would greatly benefit from parallel execution.
+
+\end{abstract}

@@ -1,0 +1,29 @@
+\begin{minipage}{\linewidth}
+\begin{lstlisting}[caption=Psuedocode of CL Initialisation and Kernel Execution, label=code:cl_init]
+//Initialise OpenCL, run once
+context -> CL_Context
+queue -> CL_Command_Queue(context)
+kernel_source -> CL_Program_Source(readfile(kernels))
+program -> CL_Program.of(kernel_source)
+program.build()
+
+//Run a kernel
+inputA -> vector<int>[N]
+inputB -> vector<int>[N]
+output -> vector<int>[N]
+bufferA -> CL_Buffer.ofSize(length(inputA)*sizeof(int))
+bufferB -> CL_Buffer.ofSize(length(inputB)*sizeof(int))
+bufferC -> CL_Buffer.ofSize(length(output)*sizeof(int))
+queue.writeVectorToBuffer(inputA, bufferA)
+queue.writeVectorToBuffer(inputB, bufferB)
+kernel -> CL_Kernel(program, KERNEL_FUNCTION_NAME)
+setKernelArgument(kernel, bufferA)
+setKernelArgument(kernel, bufferB)
+setKernelArgument(kernel, bufferC)
+queue.runKernel(kernel)
+queue.readBufferToVector(bufferC, output)
+
+return output
+
+\end{lstlisting}
+\end{minipage}

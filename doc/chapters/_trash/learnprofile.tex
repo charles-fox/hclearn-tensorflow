@@ -1,0 +1,194 @@
+% \begin{minipage}{\linewidth}
+\subsubsection{LearnWeights\#learn}
+\begin{lstlisting}[xrightmargin=0.05\linewidth,caption=Line by line profiling of the learnWeights\#learn function (boltzmann probs as an eager function), label=profiling:line_learn]
+Total time: 529.294 s
+File: /home/yakkus/github/jack-fork/hclearn/workspace/src/main/learnWeights.py
+Function: learn at line 21
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+    21                                           @profile
+    22                                           def learn(path, dictSenses, dictGrids, N_mazeSize, ecs_gnd, dgs_gnd, ca3s_gnd, b_learnIdeal=True, b_learnTrained=False, b_learnDGWeights=True, learningRate=0.01):
+    23         1          4.0      4.0      0.0      dghelper=None
+    24                                               #Learn DG weights when you have visual input
+    25         1          3.0      3.0      0.0      if b_learnDGWeights:
+    26                                                   #Extract data from dictionary of senses to train on 
+    27         1         14.0     14.0      0.0          allSURFS = [ sense.surfs for sense in dictSenses.values() ]
+    28                                                   #print allSURFS
+    29                                                   #print len(allSURFS)
+    30                                           
+    31                                                   #Select a selection?
+    32         1          3.0      3.0      0.0          percent = 100
+    33         1          5.0      5.0      0.0          numOfImages = int(len(allSURFS)*(percent/float(100)))
+    34         1          4.0      4.0      0.0          allIndices = range(0,len(allSURFS))
+    35                                                   #print(allIndices)#debug as part of python3 update process
+    36         1         19.0     19.0      0.0          np.random.shuffle(list(allIndices))# convert to list as range does not support getItem
+    37         1          5.0      5.0      0.0          randomIndices = allIndices[0:numOfImages]
+    38         1         10.0     10.0      0.0          randomSURFs = [ allSURFS[ind] for ind in randomIndices ] 
+    39                                           
+    40                                                   #Train weights
+    41         1          3.0      3.0      0.0          X=7
+    42         1          3.0      3.0      0.0          N=45
+    43         1          3.0      3.0      0.0          presentationOfData = 30
+    44         1          3.0      3.0      0.0          learningrate = 0.05
+    45         1     931414.0 931414.0      0.2          dghelper = DGStateAlan.train_weights(randomSURFs, X, N, presentationOfData, learningrate)
+    46                                           
+    47                                               #Learn ideal weights (with perfect look ahead training)
+    48         1          4.0      4.0      0.0      if b_learnIdeal: #latest :  lots of odom noise    
+    49                                                   #print ("TRAINING IDEAL WEIGHTS...")
+    50         1    5588541.0 5588541.0      1.1          (ecs_nsy, dgs_nsy, ca3s_nsy) = path.getNoiseyGPSFirings(dictSenses, dictGrids, N_mazeSize, dghelper)  #ideal percepts for path, for trainign and for inference
+    51                                           
+    52         1    7426839.0 7426839.0      1.4          senses = ecs2vd_so(ecs_nsy,dictGrids, dghelper) 
+    53                                           
+    54                                                   #Use test2.py for learning, use this for generating ground truth path to learn with test2.py
+    55         1     310995.0 310995.0      0.1          odom   = ecs2vd_oo(ecs_nsy,dictGrids) 
+    56         1      80641.0  80641.0      0.0          hids   = ca3s2v(ca3s_gnd) ##NB this is the ground truth, no noise
+    57                                           
+    58         1        830.0    830.0      0.0          WB = trainPriorBias(hids)
+    59                                           
+    60         1   19120224.0 19120224.0      3.6          WR = trainW(lag(hids,1), hids, WB, N_epochs=1, alpha=0.01)
+    61         1   18793573.0 18793573.0      3.6          WS = trainW(senses,      hids, WB, N_epochs=1, alpha=0.01)
+    62         1   17906180.0 17906180.0      3.4          WO = trainW(odom,        hids, WB, N_epochs=1, alpha=0.01)
+    63                                           
+    64         1       1552.0   1552.0      0.0          np.save(pathing+"WR",WR)
+    65         1       1768.0   1768.0      0.0          np.save(pathing+"WS",WS)
+    66         1       1016.0   1016.0      0.0          np.save(pathing+"WB",WB)
+    67         1       1405.0   1405.0      0.0          np.save(pathing+"WO",WO)
+    68                                           
+    69         1       3423.0   3423.0      0.0          np.save(pathing+"hids",hids)
+    70         1       1810.0   1810.0      0.0          np.save(pathing+"odom",odom)
+    71                                           
+    72         1      42292.0  42292.0      0.0          np.save(pathing+"senses",senses)
+    73                                                
+    74                                                   #print ("DONE TRAINING")
+    75                                           
+    76         1         11.0     11.0      0.0      if b_learnTrained:
+    77                                                   #print ("TRAINING TRAINED WEIGHTS...")
+    78                                           
+    79                                                   #foo = np.random.random()
+    80                                           
+    81         1       3884.0   3884.0      0.0          WR = np.load(pathing+'WR.npy')
+    82         1       3306.0   3306.0      0.0          WO = np.load(pathing+'WO.npy')
+    83         1       2342.0   2342.0      0.0          WS = np.load(pathing+'WS.npy')
+    84         1       1102.0   1102.0      0.0          WB = np.load(pathing+'WB.npy')
+    85         1          6.0      6.0      0.0          WB = WB[...,tf.newaxis]
+    86                                                   #WB=WB.reshape((,1))
+    87                                                   #No longer need the above lines as they are a hack and the wrong size
+    88                                           
+    89                                                   ##these are all to be learned, so overwrite them with rands
+    90         1        237.0    237.0      0.0          WR = tf.convert_to_tensor(1-2*np.random.random(WR.shape), dtype=tf.float32) #Weights recurrent
+    91         1         61.0     61.0      0.0          WB = tf.convert_to_tensor(1-2*np.random.random(WB.shape), dtype=tf.float32) #Weights bias
+    92         1         88.0     88.0      0.0          WO = tf.convert_to_tensor(1-2*np.random.random(WO.shape), dtype=tf.float32) #Odom sensors
+    93         1       1011.0   1011.0      0.0          WS = tf.convert_to_tensor(1-2*np.random.random(WS.shape), dtype=tf.float32) #Non-odom sensors - INCLUDING SURF - Need to include DG size within it
+    94                                                   #ALAN Seems like by changing the ecs2vs_so to include the surf features this size has been now modified correctly?
+    95                                                   #Above need resizing to include SURF weights
+    96                                           
+    97                                                   #hids_gnd=addBias(hids)    #NB each pop has a local bias, in addition to the global prior bias
+    98         1       2339.0   2339.0      0.0          hids_gnd=addBias(np.load(pathing+'hids.npy'))    #NB each pop has a local bias, in addition to the global prior bias
+    99                                                   #ALAN - Keep hids_gnd the same 
+   100                                                   #odom=addBias(odom)
+   101         1       1752.0   1752.0      0.0          odom=tf.convert_to_tensor(addBias(np.load(pathing+'odom.npy')), dtype=tf.float32)
+   102                                                   #senses=addBias(senses)
+   103         1      19276.0  19276.0      0.0          senses=tf.convert_to_tensor(addBias(np.load(pathing+'senses.npy')), dtype=tf.float32)
+   104                                                   #ALAN - odom and senses are matrices with rows as time columns as what is observed at that time (light, whiskers, SURF, DGencodedSURF etc.)
+   105                                           
+   106         1       1608.0   1608.0      0.0          hidslag_gnd = tf.convert_to_tensor(lag(hids_gnd,1), dtype=tf.float32)
+   107                                           
+   108         1         47.0     47.0      0.0          T = odom.shape[0]
+   109                                           
+   110         1         66.0     66.0      0.0          b = tf.convert_to_tensor(np.array([1.0]), dtype=tf.float32)  #bias
+   111         1          4.0      4.0      0.0          alpha = learningRate #0.01 ##0.0001 is stable, starting at perfects; 0.001 diverges.
+   112         1         83.0     83.0      0.0          one_const = tf.convert_to_tensor([[1.]], dtype=tf.float32)
+   113                                                   ### train with proper wake-sleep (no peeking at hid_t, though hid_{t-1} is OK )
+   114                                                   
+   115                                                   #FIXME: TURN BACK TO 1000 or so!
+   116        11         38.0      3.5      0.0          for epoch in range(0,10):
+   117        10         46.0      4.6      0.0                  err_epoch = 0  #accumulator
+   118                                           
+   119     30010     112829.0      3.8      0.0                  for t in range(0,T):
+   120                                                               #print(epoch, t)
+   121     30000     511954.0     17.1      0.1                      b_fakeSub = np.random.uniform()>0.5#tf.floor(2*tf.random.uniform(shape=()))  #learn on full data or on hist-indep subset?
+   122                                           #                    print(b_fakeSub)
+   123     30000    9168355.0    305.6      1.7                      hids_prev = hidslag_gnd[t,:]
+   124     30000    8455224.0    281.8      1.6                      s = senses[t,:]
+   125     30000    8390718.0    279.7      1.6                      o = odom[t,:]
+   126                                           
+   127                                                               #WAKE
+   128                                           
+   129     30000   29418596.0    980.6      5.6                      p_b  = boltzmannProbs(WB, one_const)
+   130     30000   31658924.0   1055.3      6.0                      p_s  = boltzmannProbs(WS, s[...,tf.newaxis], 1)
+   131     30000    1434544.0     47.8      0.3                      p = tf.identity(p_b)#.copy()
+   132     30000    9986673.0    332.9      1.9                      p=fuse(p, p_s)
+   133                                           
+   134     30000     102497.0      3.4      0.0                      if not b_fakeSub:
+   135     15030   15458254.0   1028.5      2.9                          p_o  = boltzmannProbs(WO,o[..., tf.newaxis], 1)
+   136     15030   15264881.0   1015.6      2.9                          p_r  = boltzmannProbs(WR,hids_prev[..., tf.newaxis], 1)
+   137     15030    4875694.0    324.4      0.9                          p=fuse(p, p_o)
+   138     15030    4806321.0    319.8      0.9                          p=fuse(p, p_r)
+   139                                           
+   140     30000    7522842.0    250.8      1.4                      hids = tf.cast(p > tf.random.uniform(p.shape, dtype=tf.float32), dtype=tf.float32)#.astype('d')    #sample, T=1
+   141     30000   14372749.0    479.1      2.7                      CS = cffun.outer(hids, s)
+   142     30000   16153216.0    538.4      3.1                      CB = cffun.outer(hids, b)
+   143     30000    4600414.0    153.3      0.9                      WS += alpha*CS
+   144     30000    3982619.0    132.8      0.8                      WB += alpha*CB
+   145     30000     111607.0      3.7      0.0                      if not b_fakeSub:
+   146     15030    5906466.0    393.0      1.1                          CO = cffun.outer(hids, o)
+   147     15030    5177314.0    344.5      1.0                          CR = cffun.outer(hids,hids_prev)
+   148     15030    2192352.0    145.9      0.4                          WR += alpha*CR
+   149     15030    1972498.0    131.2      0.4                          WO += alpha*CO
+   150                                                               #SLEEP
+   151                                           
+   152                                                               #retain the hid sample from the wake step -- draw samples from obs, then hid again, CD style.
+   153                                           
+   154     30000     103955.0      3.5      0.0                      if not b_fakeSub:
+   155     15030   18478766.0   1229.5      3.5                          po = boltzmannProbs(tf.transpose(WO), hids, 1)
+   156     15030    3894712.0    259.1      0.7                          o = tf.cast(po > tf.random.uniform(po.shape, dtype=tf.float32), tf.float32)#.astype('d') #sleep sample (at temp=1)
+   157                                                                   
+   158                                           
+   159     30000   36176475.0   1205.9      6.8                      ps = boltzmannProbs(tf.transpose(WS), hids, 1)
+   160     30000    7707446.0    256.9      1.5                      s = tf.cast(ps > tf.random.uniform(ps.shape, dtype=tf.float32), tf.float32)#.astype('d')    #sleep sample (at temp=1)
+   161                                           
+   162     30000   28236783.0    941.2      5.3                      p_b  = boltzmannProbs(WB, one_const)
+   163     30000   31887668.0   1062.9      6.0                      p_s  = boltzmannProbs(WS,s, 1)
+   164     30000    1425667.0     47.5      0.3                      p = tf.identity(p_b)#.copy()
+   165     30000    9992868.0    333.1      1.9                      p=fuse(p, p_s)
+   166                                           
+   167     30000     103945.0      3.5      0.0                      if not b_fakeSub:
+   168     15030   15495164.0   1030.9      2.9                          p_o  = boltzmannProbs(WO, o, 1)
+   169     15030   15334267.0   1020.2      2.9                          p_r  = boltzmannProbs(WR, hids_prev[..., tf.newaxis], 1)
+   170     15030    4860711.0    323.4      0.9                          p=fuse(p, p_o)
+   171     15030    4792349.0    318.9      0.9                          p=fuse(p, p_r)
+   172                                           
+   173                                                               #resample hids (needed to antii learn recs!)
+   174     30000    7524468.0    250.8      1.4                      hids = tf.cast(p > tf.random.uniform(p.shape, dtype=tf.float32), tf.float32)#.astype('d')    #sample, T=1
+   175     30000   14380460.0    479.3      2.7                      CS = cffun.outer(hids,s)
+   176     30000   16193415.0    539.8      3.1                      CB = cffun.outer(hids,b)
+   177     30000    4410385.0    147.0      0.8                      WS -= alpha*CS
+   178     30000    3811475.0    127.0      0.7                      WB -= alpha*CB
+   179                                           
+   180     30000     112332.0      3.7      0.0                      if not b_fakeSub:
+   181     15030    5822564.0    387.4      1.1                          CO = cffun.outer(hids,o)
+   182     15030    5155719.0    343.0      1.0                          CR = cffun.outer(hids,hids_prev)
+   183     15030    2086801.0    138.8      0.4                          WR -= alpha*CR
+   184     15030    1870146.0    124.4      0.4                          WO -= alpha*CO
+   185                                           
+   186                                           
+   187                                                               #TODO report error rate?
+   188     30000   16043077.0    534.8      3.0                      e = err( hids, hids_gnd[t,:] )
+   189     30000    1499515.0     50.0      0.3                      err_epoch += e
+   190                              
+   191                                           
+   192                                           
+   193                                                      # print('epoch:'+str(epoch)+' err:'+str(err_epoch))
+   194                                           
+   195         1       1488.0   1488.0      0.0          np.save(pathing+'tWR',WR)
+   196         1       1677.0   1677.0      0.0          np.save(pathing+'tWS',WS)
+   197         1       1299.0   1299.0      0.0          np.save(pathing+'tWB',WB)
+   198         1       1263.0   1263.0      0.0          np.save(pathing+'tWO',WO)
+   199                                               # 1 see if these give ok results
+   200                                               # 2 try disbaling odom info again, and learning in its absence half the time 
+   201                                           
+   202         1          3.0      3.0      0.0      if b_learnDGWeights:
+   203         1          3.0      3.0      0.0          return dghelper
+\end{lstlisting}
+% \end{minipage}

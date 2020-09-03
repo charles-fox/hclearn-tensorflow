@@ -1,0 +1,28 @@
+% Somewhere to put commands in shorthand form
+\newcommand{\footcaption}[1]{\caption[#1]{#1\footnotemark}}
+\newcommand{\mono}[1]{\texttt{#1}}
+\newcommand{\tableref}[1]{Table \ref{#1}}
+\newcommand{\figureref}[1]{Figure \ref{#1}}
+\newcommand{\footref}[1]{Footnote \ref{#1}}
+\newcommand{\sectionref}[1]{Section \ref{#1}}
+\newcommand{\eqnref}[1]{Equation \ref{#1}}
+
+
+% Comments in the report for identifying key points/questions
+\newcommand{\noteGeneral}[1]{\textit{\color{cyan}#1}}
+\newcommand{\noteCF}[1]{\textit{\color{red}#1}}
+\newcommand{\noteComment}[1]{\textit{\color{green}#1}}
+\newcommand{\noteAttention}[1]{\textit{\color{blue}#1}}
+\newcommand{\source}[0]{\textbf{\textit{\color{magenta}This claim needs a source.}}}
+\newcommand{\wording}[0]{\textbf{\textit{\color{magenta}This statement is unclear and needs re-wording.}}}
+
+
+% Listings (Code segments)
+\renewcommand{\lstlistingname}{Code Segment}
+\renewcommand{\lstlistlistingname}{List of \lstlistingname s}
+\newcommand{\coderef}[1]{Code Segment \ref{#1}}
+
+% figure
+\newcommand{\picturesque}[3]{\begin{figure}\centering\includegraphics[width=0.8\textwidth]{#1}\caption{#2}\label{#3}\end{figure}}
+
+\newcommand{\noteAndrew}[1]{\textbf{\color{amber}#1}}

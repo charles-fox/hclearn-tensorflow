@@ -1,0 +1,29 @@
+
+
+\begin{minipage}{\linewidth}
+\begin{lstlisting}[caption={examples of unit tests for different functions, labelled by the file and function which it refers to.}, label=code:unit_test_eg]
+File: cffun.py
+Function: Lag
+def test_thousand_by_thousand_hundred(self):
+        results = cffun.lag(self.initial_thousand_by_thousand, 100)
+        actual = np.vstack((np.repeat([self.initial_thousand_by_thousand[0, :]], 100, 0), self.initial_thousand_by_thousand))[:-100, :]
+        assert_array_equal(results, actual, "[Lag] When lagging by one on a 2D array with second dim=1, result should be the same")
+
+Function: Invsig
+def test_vector_10(self):
+        calculated_results = cffun.invsig(self.vector_10)
+        actual_results = -np.log((1./self.vector_10)-1)
+        if type(calculated_results) is tf.Tensor:
+            calculated_results = calculated_results.numpy()
+        assert_almost_equal(calculated_results, actual_results)
+
+File: rbm.py
+Function: Hardthreshold
+def test_two_by_two(self):
+        calculated_results = rbm.hardThreshold(self.initial_2)
+        actual_results = np.array([[0, 1], [1, 0]])
+        assert_almost_equal(calculated_results, actual_results,
+                            err_msg="[HardThreshold] Calculated results are not equal to actual results to 7 decimal places.")
+
+\end{lstlisting}
+\end{minipage}

@@ -1,0 +1,37 @@
+\section{Optimisation of data type casting}
+Relating to the data type optimisation, data type casting is an expensive operation.
+This is due to the need to reassign memory to match the new data type.
+This does not affect the conversion from NumPy arrays to Tensorflow tensors as they are initialised as 32 bit floats.
+However the model uses a comparison of probability against random values to create a new hidden state representation after fusing the probabilities from the different inputs.
+This creates a boolean tensor.
+NumPy is able to utilise Python's weak typing to use a boolean tensor as a numerical representation, but Tensorflow uses strong typing.
+This causes us to need to cast the boolean values to float values.
+As this is happening multiple times in every step of the learning process, it provides a candidate for optimisation.
+
+\subsection{Results from optimising the casting operation}
+One method for optimising the casting operation is to use the \mono{tf.where} function.
+This creates a tensor of two values using a conditional statement to determine which value to use.
+This is useful as the \mono{tf.where} function performs the same operation as casting.
+Using the Timeit module, we can test whether this operation is faster than casting.
+
+\begin{table}[ht]
+    \centering
+    \begin{tabular}{|c|c|c|}
+        \hline
+        Number of Nodes & tf.cast & tf.where \\ \hline
+        10              & 62.073  & 43.839   \\ \hline
+        100             & 62.091  & 43.934   \\ \hline
+        1000            & 62.208  & 44.035   \\ \hline
+        10000           & 61.614  & 44.288   \\ \hline
+    \end{tabular}
+    \caption{Timing 100000 invocations of each function over different numbers of nodes. The times reported are cumulative of all 100000 invocations.
+    % Test to see whether \mono{tf.where} is an optimisation over casting for different numbers of units for 100000 invocations.
+    }
+    \label{tab:cast_v_where}
+\end{table}
+
+
+From \tableref{tab:cast_v_where}, it can be seen that there is a noticeable speed up by using \mono{tf.where} across different numbers of nodes.
+This implies that implementing this optimisation into the model will reduce the overall time taken to learn.
+After implementing the optimisation into the model, we get an average runtime of 332.2 seconds.
+This is a minor improvement over the implementation of test ID 17, however it is an improvement thus we will be using this optimisation in future experiments. 

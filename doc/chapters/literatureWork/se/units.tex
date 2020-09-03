@@ -1,0 +1,119 @@
+
+\subsection{Unit tests}
+\label{subsec:unittest}
+{
+A big problem with creating and improving software is that it is likely to break.
+This is especially true when refactoring to speed up the code.
+This is due to changes in underlying implementation creating side effects in the code.
+These side effects cause the code to break, and if left unchecked increases the technical debt, which accrues as a natural part of the software development life-cycle.
+
+\begin{minipage}{\linewidth}
+\begin{lstlisting}[caption=Example unit to be tested, label=code:unit, language=python]
+def boltzmannProbs(W, x, axis=0):
+    """
+    :param W: Input Weight Matrix
+    :param x: Input Vector Matrix
+    :param axis: Axis of contraction
+    :return: activation probabilities
+    """
+    reward = tf.tensordot(W, x, axis)
+    E_on  = tf.negative(reward)
+    E_off = 0.0*E_on
+    Q_on = tf.math.exp(-E_on)
+    Q_off = tf.math.exp(-E_off)
+    P_on = tf.math.divide(Q_on, tf.math.add(Q_on, Q_off))
+    return P_on
+\end{lstlisting}
+\end{minipage}
+
+Unit tests are a method of both reducing technical debt and ensuring that behaviour remains the same.
+This is because the tests are used to verify behaviour after refactoring a unit.
+A unit can be considered any functional object, however we define a unit as a custom function in the code.
+An example of a unit can be seen in \coderef{code:unit}.
+}
+
+
+
+{
+A test is a wrapper function that provides known inputs to the unit and checks the output of the unit against a known output.
+The check is done via an assert statement.
+An assert statement fails if the values that the assertion is checking do not match.
+We define a test function as a singular concept on the unit being tested.
+This allows us to understand the nature of the unit for that concept.
+It also reduces confusion on what a given test is meant to do.
+This reduces technical debt as future developers are not having to figure out what the 
+purpose of a given test is, which increases productivity.
+An example of a test can be seen in \coderef{code:test}
+}
+
+
+
+\begin{minipage}{\linewidth}
+\begin{lstlisting}[caption=Example test for a unit, label=code:test, language=python]
+def test_rbm_small():
+    input_weights = np.array([[.1, .2], [.3, .4]])
+    input_vector = np.array([.5, .6])
+    calculated_results = rbm.boltzmannProbs(input_weights, input_vector)
+    actual_results = np.array([0.54239794, 0.5962827])
+    assert_almost_equal(calculated_results, actual_results,
+                            err_msg="[BoltzmannProbs] Calculated results are not equal to actual results to 7 decimal places.")
+\end{lstlisting}
+\end{minipage}
+
+{
+%A big problem with the improvement of software is that it breaks when you change it. You are trying to speed it up but u change its functionality.   [introduce a problem]
+%[sets you up to describe a solution]
+%Units tests are an amazing way to fix this problem.  
+%what is a unit test? 
+%    what is a unit?
+%        a function?  a class?  a file ?
+%    what is a test?
+%        one call of a unit? many calls of a unit?
+%            many calls with a similar theme?
+%        Used for testing how functions handle inputs and whether actual behaviour is what we expect.
+%                using assertions
+%                    say what is an assertion
+%        show code examples  
+%    martin fowler defined unit test as ...
+ 
+ }      
+
+
+\subsubsection{Test Driven Development and HC-UCPF}
+Test Driven Development is a method of developing software that focuses on writing tests before writing code.
+This allows the developer to write valid code the first time round, and does not need to spend long hours debugging the code.
+This works well for new projects.
+However our project involves refactoring an existing project.
+Thus we can not follow test driven development to the letter.
+But we can use the approach of test driven development as part of the refactoring process.
+This means we write our tests and ensure that the existing code passes them.
+This also has the benefit of helping to understand the purpose of the code.
+
+By refactoring code in this manner, it helps with the process of debugging.
+This is due to being able to pass the system inputs to the tests, and seeing what is causing the error.
+Furthermore, from our definition of the unit test, we can obtain a hierarchical approach to debugging.
+This is due to each of our functions being units, and invoking other functional units within our system.
+
+For example, the function \verb|learn| in learnWeights.py\footnote{Found at \url{https://github.com/A-Yakkus/hclearn/blob/msc2020/learnWeights.py\#L16}} invokes the \verb|boltzmannProbs| function in rbm.py\footnote{Found at \url{https://github.com/A-Yakkus/hclearn/blob/msc2020/rbm.py\#L9}}.
+If an error occurs during the learn function with respect to the \mono{boltzmannProbs} function, we can pause execution of the learn function and run the current inputs through our tests to find where the erroneous behaviour occurs.
+Once we understand the erroneous behaviour, it can be considered trivial to fix it.
+This would then allow successive invocations of the system to run without encountering the error. 
+
+    % (though disputed by other people x y and z in these ways..)
+    % what they do:
+    %     they assure us that each unit works
+    %     that allows us to try changing a unit
+    %             eg to optimise
+    %     it also allows delta debugging:
+    %         hierarchy of unit tests
+    %         find a bug by looking at red/green and homeing in
+    %     what this is great
+    %         saving tons of time! instant bug detection and localistion
+    % TDD: write tests first
+    % Refactoring: fowler's approach: how to optimise other peoples code  (vs TDDm is different)
+    %     % Our case has it different as we already have functions implemented.
+    % Parallel debugging:
+    %   parallel is especially important use case here
+    %         [NB we already told the reader about parallel techs, so we can refer to that now]
+    %   new big idea here -- using fowler refactors to make parallel debugging tolerable !  is  big deal.
+

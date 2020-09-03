@@ -1,0 +1,64 @@
+
+CF: I sugget restructure:
+GENERAL METHODS
+   describing the general processes you will be using
+EXPERIMENTS
+   subsection for each specific refactoring you will do, corresponding to each result
+
+
+
+
+
+
+\section{Other optimisations}
+% \noteCF{ consider having a new section/theme on memory optimisation. so far we only thought about speed optimisation. but you are hitting on memory limits now.  use the same unit test methods to make sure optimisations are working.}
+\subsubsection{Memory optimisation via data types}
+As well as optimisations for speed, we can also optimise for memory.
+This is useful because larger networks require more memory to train.
+However memory is a finite resource.
+When Tensorflow converts from numpy floating point array and python floats to being 64 bit float tensor.
+This is not suitable for GPU processing.
+This is because GPU's have the best efficiency when working on 32 bit floats.
+This optimisation was found after inflating the size of the CA3 to see how it affected the time of the learning process after optimisation.
+Furthermore there is a reduction in precision of the model, however the effect of this is can be considered negligible on overall performance of the model. 
+
+
+
+
+
+
+CF: i suggest don't confuse methods with results here.  Introducing the error function optimisation is a method. The finding that it takes 20pc times is a result. it should go in the result along with the other informtion you mention here.
+
+
+
+
+
+
+
+% \begin{markdown}
+
+% Profiling the parallel version 
+% #. shows a lot of conversions of numpy arrays and python ints/floats to tensorflow tensors
+% #. this is due to it being done "on the fly"
+% #. however this can be reduced, as tensorflow slicing and numpy slicing is the same
+% #. thus move the conversions outside for loops defining time/epochs
+% #. Speed up occurs (approx, 14\% at 1000 nodes) \note{i.e. PROFIT!}
+
+
+% Rabbit Hole
+% #. Scanning codebase for slower functions
+% #. see `sum` keyword in error function
+% #. use timeit to time how long it takes to run 10000 invocations consecutively for sizes [10, 100, 1000, 10000]
+% #. results for it are [8s, 80s, 800s, 8700s]
+% #. seems like good candidate for our optimisation process
+% #. do optimisation process (unittests etc)
+% #. get results of [1e-2s, 1e-1s, 1s, 10s]
+% #. optimised version shows speed up, integrate into system
+% #. run check to see whether speed up helps
+% #. it doesn't (800s over 440s)
+% #. bad optimisation. Good thing we can revert to pre-optimisation thanks to version control
+
+% tf.function
+
+
+% \end{markdown}

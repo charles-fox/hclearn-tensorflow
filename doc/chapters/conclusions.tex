@@ -1,0 +1,66 @@
+{
+% Our work was effective and does reduce time to learn when CA3 is large.
+% However current environment does not reflect this as it is too small.
+% This suggests that a new toy environment should be created and used as a comparison.
+% This is due to artificial inflation of the RBM, and not actual increase in size.
+}
+{
+Our results indicate that we have achieved our goal, especially when the size of the CA3 is large, which makes the model more suitable for real world use. 
+However the environment is relatively small, and the inflation of the CA3 sub-field can be considered artificial.
+This means that there may be a small performance improvement for a larger environment.
+This can be checked by using the current parallel implementation in a new environment which covers a larger and more complex environment in future work.
+}
+
+{
+% We assume that tensorflow is the best for the parallelisation
+% However there are multiple libraries that achieve the same objective.
+% Further work can be done to optimise the process by changing which parallelisation library is used as tensorflow does contain a large amount of overhead.
+}
+
+{
+Next, we assumed that Tensorflow was the best option for parallelisation.
+This is because of its popularity and prominence as a machine learning library.
+However, as we outline in \sectionref{subsec:highlevellibs}, there are many libraries for Python which handle parallelisation and scaling.
+As such we may be able to obtain better results from a different library.
+This is because Tensorflow has initialisation overhead on first call, which can slow down the learning process, whereas other libraries will have different points of initialisation overhead, or does not load unnecessary modules, e.g. Keras. 
+}
+
+{
+% Our initial profiling showed that the learning process was slow.
+% This became the focus of our optimisations for time.
+% However we do not verify that the optimisations implemented provide similar accuracy to initial results.
+% Whilst this verification is not an issue for this project, if the model is to be deployed the verification would need to be heavily scrutenised as part of the deployment process.
+}
+
+{
+Profiling the code showed that the learning process was slow.
+This made it the best segment to optimise.
+However our results indicate that the optimisation is only effective at scale.
+We can assume that the problem lies within the matrix multiplication of each type of sensory/weight data in the model, (data from sensors, odometry data, recurrent neurons in the CA3 and the biases) when looking at the current environment.
+This suggests that further work into optimising this multiplication will heavily reduce the overall time to learn, given that particular multiplication occurs ~250,000 times.
+
+Furthermore, our secondary metric of model accuracy shows that our refactoring of the model is less than satisfactory.
+This is because of the dramatic loss of accuracy of the learned weights.
+However, our refactored model still performs twice as well as randomly selecting weights.
+The model is also influenced by randomness, which may have played a part in how well the model learns, considering only 10 epochs are used during the training process.
+This indicates that further work needs to be done to understand how the model reacts to randomness, and how that affects the overall accuracy of the model.
+
+}
+
+{
+% Consider randomness and how that affects our results. (This might be better in the reflection)
+
+Whilst we attempted to account for as many variables as possible within the optimisation process, the overall randomness of the model causes variations within results to occur.
+An example of this is the model randomly choosing to account for observations and recurrent values in the  contrastive divergence learning.
+This can be managed by setting a seed, however the asynchronous nature of parallel computing means that different threads can retrieve the next number in the random number generation in a different order with successive invocations.
+Thus we chose to allow for the randomness to affect the learning process to provide us with a set of results that can be expected in a real world environment. 
+}
+
+% \noteComment{In Conclusion....}
+
+{
+In conclusion, our results show that our current optimisations only have an effect on the model at scale.
+This is useful as real world environments are larger than the plus maze environment the model currently learns.
+Finally, we have laid the foundations for future work to build upon our current refactoring of the model to Tensorflow using unit tests.
+
+}

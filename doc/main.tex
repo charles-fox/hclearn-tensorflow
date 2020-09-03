@@ -1,0 +1,98 @@
+%% University of Lincoln Computer Science Thesis Template
+
+%% @version     1.0.4
+%% @lastchanged 12th June 2020
+
+% The document class -- remove [harvard] if you want
+% numeric-style referencing.
+\documentclass[harvard,bibliography=totoc]{lincolncsthesis}
+
+% Custom packages that you need to include
+\input{preamble/packages.tex}
+\input{preamble/shortcuts}
+
+% Your thesis details -- edit the file at the path below
+% so it shows your name, title, etc. 
+\input{preamble/thesis-details.tex}
+
+% Set up the bib files which are gonna be used
+% throughout this document
+\input{preamble/bib-setup.tex}
+
+\begin{document}
+
+% start of document
+% --------------------------
+
+% Make the title. You can pass an option to this
+% to render the title differently, like so:
+%\maketitle[logo-first]
+\maketitle
+
+
+% The abstract of the thesis
+\input{chapters/abstract.tex}
+
+\input{chapters/acknowledgements.tex}
+
+% Print out the table of tables and table of figures and
+% tell the template we're about to start the body of the
+% thesis.
+
+\thesisTables
+\thesisBodyStart
+
+
+% start of thesis body
+% ---------------------------
+
+% Include introduction
+\chapter{Introduction}
+\input{chapters/introduction.tex}
+
+% Related work 
+\chapter{Background and Related Work}
+\input{chapters/related-work.tex}
+
+% % Method
+% \chapter{Methodology}
+% \input{chapters/method.tex}
+
+% % Method
+% \chapter{Results}
+% \input{chapters/results}
+
+\chapter{Methods, Experiments and results}
+\input{chapters/methodology/overview.tex}
+
+% Conclusions
+\chapter{Discussions and Conclusions}
+\input{chapters/conclusions.tex}
+
+
+% end of thesis body
+% --------------------------
+
+% Print out the references
+\pagebreak
+\phantomsection
+\addcontentsline{toc}{chapter}{References}
+\printReferences
+
+
+% Acknowledgements
+
+
+\renewcommand{\chaptername}{Appendix} % To change title from chapter to Appendix
+\appendix
+\chapter{Additional assessment information}
+
+
+\input{chapters/appendices/paperwork}
+
+\input{chapters/appendices/reflection}
+
+%  \chapter{Data}
+%  \input{chapters/appendices/learnprofile}
+
+\end{document}

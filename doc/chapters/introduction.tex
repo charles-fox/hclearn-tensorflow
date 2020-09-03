@@ -1,0 +1,41 @@
+
+%\textbf{\color{red}CF: start with the big picture: ie hippocampus is important and could be used by %robots. BUT the current implementation is too slow for robots to use!   THEREFORE we are going to %fix it!}
+%\textbf{\color{red}CF: gradually work down to the specific task}
+%\textbf{\color{red}CF: parallel computing provides a possible solution …  Parallel computing is %great !  because …. (keep brief, this is not the lit review)}
+%\textbf{\color{red}CF: A particular model of HC is ...}
+%\textbf{\color{red}CF: BUT it is really hard to make sure the implementation still works in the %same way …}
+%\textbf{\color{red}CF: REFACTORING is great and will resolve the second big but because ….}
+%\textbf{\color{red}CF: one para, clearly state what this thesis is going to deliver (and why.)}
+
+The hippocampus is an important area of the brain involved in spatial memory. 
+This allows us to consider it as a method of robot navigation. 
+This can be done by mapping the specialised cells in the hippocampus to activations in a machine learning system.
+However this approach can be considered slow due to the serial learning process, and is unsuitable for real-time use.
+Despite this, there are sections of the model which would benefit from parallelisation, making a real-time system using this approach more viable.
+
+One model of the hippocampus is the unitary coherent particle filter, as proposed by \cite{foxandprescott2010A}. 
+This model utilises the wake-sleep algorithm proposed by \cite{hintonDBN2006}.
+This is useful as it allows for the model to respond to immediate changes to inputs. %{\color{green} needs verifying by reading papers.}
+The model architecture %{\color{green} and data flow}
+is explored in more detail in \sectionref{subsubsec:ucpf} .
+
+We can use modern compute technology, such as GPUs to parallelise the learning process of the model. 
+By parallelising our code, we enable the easy horizontal scaling of the model by reducing the workload on a given processing unit. 
+As part of this process, we will need to re-implement the code to allow for a parallel implementation of the serial learning process.
+
+A process for re-implementing code is refactoring.
+This involves re-writing code without changing the external behaviour of the code.
+This is beneficial to our project as it provides us a methodology to maintain behaviour when as we switch the model to use a parallel implementation.
+
+In this thesis, we will refactor the Hippocampal model of \cite{saul2011} into a new parallel TensorFlow based implementation.
+We do this by wrapping the functions in unit tests, which will enable us to make the model run faster and be used on robots in real time.
+% using \noteCF{Fowler’s theory of refactoring\wording} wrapped by unit tests, to make the model run faster and able to be used on real time robots.
+% reconsider 
+
+% The Introduction feels like I might need a bit more, but not sure what to talk about, maybe criticisms of refactoring or the model, but that feels like it should be in literature review.
+
+%There are multiple types of refactoring as it covers a variety of changes, such as renaming variables to have more meaningful names, reorganising functions to be in a more appropriate place and vectorisation of loops.
+% Include this as footnote at end of the above line?
+% More examples of changes that can be considered refactoring can be found here:
+% https://refactoring.com/catalog/index.html
+%
